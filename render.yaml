@@ -2,32 +2,46 @@ services:
   - type: web
     name: retina-ai
     runtime: python
-    plan: standard # EfficientNetB7 inference needs more than the free tier's RAM
+    pythonVersion: "3.11.9"
+
+    plan: standard
     region: oregon
     branch: main
-    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
-    startCommand: "gunicorn -c gunicorn.conf.py run:app"
+
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+
+    startCommand: gunicorn -c gunicorn.conf.py run:app
+
     healthCheckPath: /api/health
     autoDeploy: true
+
     envVars:
       - key: APP_ENV
         value: production
+
       - key: SECRET_KEY
         generateValue: true
+
       - key: MODEL_ARCHITECTURE
         value: EfficientNetB7
+
       - key: IMAGE_SIZE
         value: "600"
+
       - key: MAX_UPLOAD_SIZE_MB
         value: "10"
+
       - key: RATE_LIMIT_ENABLED
         value: "true"
+
       - key: RATE_LIMIT_DEFAULT
         value: "60 per minute"
+
       - key: LOG_LEVEL
         value: INFO
-      - key: PYTHON_VERSION
-        value: 3.11.9
+
     disk:
       name: retina-ai-data
       mountPath: /opt/render/project/src/persisted_data

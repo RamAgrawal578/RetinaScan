@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Screen an Image — RetinaAI{% endblock %}
+
+{% block content %}
+<section class="section-predict">
+    <div class="container">
+        <span class="eyebrow">Upload a fundus photograph</span>
+        <h1 class="section-title">Screen a retinal image</h1>
+        <p class="section-sub">
+            Accepted formats: JPG, PNG, BMP, TIFF. Maximum size 10&nbsp;MB.
+            For best results, use a well-focused, well-illuminated fundus
+            capture without heavy vignetting.
+        </p>
+
+        <form method="POST" action="{{ url_for('predict.predict_submit') }}" enctype="multipart/form-data" class="upload-form" id="uploadForm">
+            <div class="dropzone" id="dropzone">
+                <input type="file" name="image" id="imageInput" accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff" required hidden>
+                <div id="dropzonePrompt" class="dropzone-prompt">
+                    <span class="aperture-mark" aria-hidden="true">
+                        <svg viewBox="0 0 40 40" width="34" height="34">
+                            <circle cx="20" cy="20" r="18" class="aperture-ring-outer"></circle>
+                            <circle cx="20" cy="20" r="11" class="aperture-ring-mid"></circle>
+                            <circle cx="20" cy="20" r="4" class="aperture-ring-core"></circle>
+                        </svg>
+                    </span>
+                    <p><strong>Drag &amp; drop</strong> a fundus image here, or <span class="link-like">browse files</span></p>
+                </div>
+                <img id="imagePreview" class="image-preview" alt="Selected fundus image preview" hidden>
+            </div>
+
+            <div class="form-check form-check-clinical">
+                <input class="form-check-input" type="checkbox" name="generate_report" id="generateReport">
+                <label class="form-check-label" for="generateReport">
+                    Also generate a downloadable PDF report
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-clinical-primary btn-lg w-100" id="submitBtn">
+                Run screening
+            </button>
+
+            <div id="loadingIndicator" class="loading-indicator" hidden>
+                <span class="aperture-spinner" aria-hidden="true"></span>
+                <span>Analyzing image &mdash; running preprocessing and inference...</span>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const dropzone = document.getElementById('dropzone');
+    const input = document.getElementById('imageInput');
+    const prompt = document.getElementById('dropzonePrompt');
+    const preview = document.getElementById('imagePreview');
+    const form = document.getElementById('uploadForm');
+    const loading = document.getElementById('loadingIndicator');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function showPreview(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.hidden = false;
+            prompt.hidden = true;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    dropzone.addEventListener('click', () => input.click());
+    input.addEventListener('change', () => showPreview(input.files[0]));
+
+    ['dragover', 'dragenter'].forEach(evt => {
+        dropzone.addEventListener(evt, (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dropzone-active');
+        });
+    });
+    ['dragleave', 'drop'].forEach(evt => {
+        dropzone.addEventListener(evt, (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dropzone-active');
+        });
+    });
+    dropzone.addEventListener('drop', (e) => {
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            input.files = e.dataTransfer.files;
+            showPreview(file);
+        }
+    });
+
+    form.addEventListener('submit', () => {
+        loading.hidden = false;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Analyzing...';
+    });
+});
+</script>
+{% endblock %}

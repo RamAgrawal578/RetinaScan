@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}About — RetinaAI{% endblock %}
+
+{% block content %}
+<section class="section-about">
+    <div class="container">
+        <span class="eyebrow">About the project</span>
+        <h1 class="section-title">A transfer-learning screening aid for retinal disease</h1>
+        <p class="section-sub">
+            RetinaAI is a research and portfolio project applying deep
+            convolutional transfer learning to retinal fundus photography.
+            It is built to be retrained on any folder-structured dataset
+            without touching the codebase, and to be transparent about its
+            own confidence and reasoning via Grad-CAM attention maps.
+        </p>
+
+        <div class="row g-4 mt-2">
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h2 class="result-subheading">Architecture</h2>
+                    <p>
+                        The classifier uses transfer learning from an
+                        accuracy-first ImageNet backbone (EfficientNetB7 by
+                        default, with automatic fallback to EfficientNetV2L,
+                        DenseNet201, or ResNet152V2 if the preferred backbone
+                        cannot be loaded), followed by a custom
+                        classification head with batch normalization and
+                        dropout for regularization.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h2 class="result-subheading">Preprocessing</h2>
+                    <p>
+                        Every image is validated, center-cropped, resized
+                        with aspect-ratio preservation, denoised, contrast
+                        enhanced with CLAHE, and sharpened — identically at
+                        both training and inference time.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        {% if model_info %}
+        <div class="model-info-panel mt-4">
+            <h2 class="result-subheading">Current deployed model</h2>
+            <dl class="result-meta">
+                <div><dt>Status</dt><dd>{{ "Loaded" if model_info.model_loaded else "Not yet trained" }}</dd></div>
+                <div><dt>Architecture</dt><dd>{{ model_info.architecture }}</dd></div>
+                <div><dt>Classes</dt><dd>{{ model_info.num_classes }}</dd></div>
+                <div><dt>Trained at</dt><dd class="mono">{{ model_info.trained_at }}</dd></div>
+                <div><dt>App version</dt><dd>{{ model_info.app_version }}</dd></div>
+            </dl>
+            {% if model_info.class_names %}
+            <p>Known classes: {{ model_info.class_names|join(', ') }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="disclaimer-panel mt-4">
+            <h2 class="result-subheading">Medical disclaimer</h2>
+            <p>
+                RetinaAI is a research and educational tool. It is not a
+                certified medical device and must never be used as a
+                substitute for evaluation by a qualified ophthalmologist or
+                other licensed medical professional.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

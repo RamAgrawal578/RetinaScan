@@ -1,0 +1,65 @@
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.Python
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- Environment / secrets ------------------------------------------------
+.env
+*.env.local
+
+# --- Dataset (never commit medical imaging data) ---------------------------
+dataset/*
+!dataset/README.md
+
+# --- Model artifacts (large binaries; retrain instead of committing) --------
+saved_models/*
+!saved_models/.gitkeep
+*.keras
+*.h5
+*.tflite
+*.pb
+
+# --- Runtime-generated content -----------------------------------------------
+uploads/*
+!uploads/.gitkeep
+reports/*
+!reports/.gitkeep
+logs/*
+!logs/.gitkeep
+!logs/tensorboard/.gitkeep
+logs/tensorboard/*
+!logs/tensorboard/.gitkeep
+
+# --- Editor / OS -------------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Jupyter (explicitly disallowed by project rules, ignored just in case) --
+.ipynb_checkpoints/
+*.ipynb
+.tfcache/
+dataset/
+raw_dataset/
+
+__pycache__/
+*.pyc
+
+venv/
+.venv/
+
+*.log
+
+.DS_Store
+Thumbs.db

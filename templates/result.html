@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Result — RetinaAI{% endblock %}
+
+{% block content %}
+<section class="section-result">
+    <div class="container">
+        <span class="eyebrow">Screening result</span>
+        <h1 class="section-title">{{ prediction.predicted_class.replace('_', ' ') }}</h1>
+
+        <div class="result-grid">
+            <div class="result-images">
+                <div class="result-image-card">
+                    <span class="result-image-label">Uploaded Image</span>
+                    <img src="{{ url_for('predict.uploaded_image', filename=uploaded_filename) }}" alt="Uploaded fundus image" class="result-image">
+                </div>
+                {% if prediction.gradcam_base64 %}
+                <div class="result-image-card">
+                    <span class="result-image-label">Grad-CAM Attention</span>
+                    <img src="data:image/png;base64,{{ prediction.gradcam_base64 }}" alt="Grad-CAM heatmap overlay" class="result-image">
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="result-summary">
+                <div class="risk-badge risk-badge-{{ prediction.risk_level.split(' ')[0].lower() }}">
+                    {{ prediction.risk_level }} risk
+                </div>
+
+                <dl class="result-meta">
+                    <div><dt>Confidence</dt><dd>{{ "%.1f"|format(prediction.confidence * 100) }}%</dd></div>
+                    <div><dt>Inference time</dt><dd>{{ prediction.inference_time_ms }} ms</dd></div>
+                    <div><dt>Model architecture</dt><dd>{{ prediction.architecture or 'N/A' }}</dd></div>
+                    <div><dt>Model version</dt><dd>{{ prediction.model_version or 'N/A' }}</dd></div>
+                    <div><dt>Timestamp</dt><dd class="mono">{{ prediction.timestamp }}</dd></div>
+                </dl>
+
+                <h2 class="result-subheading">Top predictions</h2>
+                <div class="probability-bars">
+                    {% for item in prediction.top_k %}
+                    <div class="probability-row">
+                        <span class="probability-label">{{ item.class.replace('_', ' ') }}</span>
+                        <div class="probability-track">
+                            <div class="probability-fill" style="width: {{ (item.confidence * 100)|round(1) }}%;"></div>
+                        </div>
+                        <span class="probability-value mono">{{ "%.1f"|format(item.confidence * 100) }}%</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <h2 class="result-subheading">Explanation</h2>
+                <p>{{ prediction.explanation }}</p>
+
+                <div class="result-actions">
+                    {% if report_filename %}
+                    <a href="{{ url_for('predict.download_report', filename=report_filename) }}" class="btn btn-clinical-primary">Download PDF report</a>
+                    {% endif %}
+                    <a href="{{ url_for('predict.predict_form') }}" class="btn btn-clinical-ghost">Screen another image</a>
+                </div>
+
+                <p class="disclaimer-text">{{ prediction.disclaimer }}</p>
+            </div>
+        </div>
+
+        <details class="all-probabilities">
+            <summary>View full probability breakdown</summary>
+            <table class="table table-clinical">
+                <thead><tr><th>Class</th><th>Probability</th></tr></thead>
+                <tbody>
+                {% for name, prob in prediction.all_probabilities.items()|sort(attribute='1', reverse=true) %}
+                    <tr><td>{{ name.replace('_', ' ') }}</td><td class="mono">{{ "%.2f"|format(prob * 100) }}%</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </details>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Contact — RetinaAI{% endblock %}
+
+{% block content %}
+<section class="section-contact">
+    <div class="container">
+        <span class="eyebrow">Get in touch</span>
+        <h1 class="section-title">Questions, feedback, or collaboration</h1>
+        <p class="section-sub">
+            This is a research and portfolio project. For questions about
+            the model, the dataset, or deployment, reach out using the
+            details below.
+        </p>
+
+        <div class="contact-card">
+            <dl class="result-meta">
+                <div><dt>Project type</dt><dd>AI/ML research &amp; portfolio project</dd></div>
+                <div><dt>Repository</dt><dd>See README.md for setup, training, and deployment instructions</dd></div>
+                <div><dt>API status</dt><dd><a href="/api/health">/api/health</a></dd></div>
+            </dl>
+            <p class="mt-3">
+                To report an issue with a prediction, please include the
+                timestamp shown on the result page along with a description
+                of the problem.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

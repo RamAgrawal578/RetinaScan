@@ -13,7 +13,7 @@
         </p>
 
         <form method="POST" action="{{ url_for('predict.predict_submit') }}" enctype="multipart/form-data" class="upload-form" id="uploadForm">
-            {{ csrf_token() }}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="dropzone" id="dropzone">
                 <input type="file" name="image" id="imageInput" accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff" required hidden>
                 <div id="dropzonePrompt" class="dropzone-prompt">
